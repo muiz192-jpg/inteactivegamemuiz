@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة اختبار رياضيات 1-1 - أول ثانوي مسارات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 min-h-screen text-slate-100 flex flex-col justify-between">
+
+    <header class="w-full bg-slate-900/80 border-b border-slate-700 p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="bg-indigo-600 p-2 rounded-xl text-white font-bold text-xl shadow-md">🧮</div>
+                <div>
+                    <h1 class="font-bold text-lg text-white">رياضيات 1-1 | الفصل الأول: التبرير والبرهان</h1>
+                    <p class="text-xs text-indigo-300">أول ثانوي - نظام المسارات</p>
+                </div>
+            </div>
+            <div id="timer-container" class="hidden items-center bg-rose-900/60 border border-rose-500/50 px-4 py-1.5 rounded-full shadow-inner">
+                <span class="text-xs text-rose-200 ml-2">الوقت المتبقي:</span>
+                <span id="time-left" class="font-mono font-bold text-rose-300 text-lg">90:00</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl w-full mx-auto p-4 md:p-6 my-auto flex-grow flex items-center justify-center">
+
+        <!-- STEP 1: Registration View -->
+        <section id="view-welcome" class="glass-card text-slate-800 rounded-3xl p-8 shadow-2xl w-full max-w-lg border border-slate-200">
+            <div class="text-center mb-6">
+                <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">اختبار فتري تجريبي</span>
+                <h2 class="text-2xl font-black text-slate-900 mt-3">منصة الاختبارات التفاعلية</h2>
+                <p class="text-sm text-slate-500 mt-1">الرجاء إدخال بياناتك البدئية لبدء الاختبار (مدة الاختبار: 90 دقيقة)</p>
+            </div>
+            <form id="form-register" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">الاسم الثلاثي:</label>
+                    <input type="text" id="student-name" required placeholder="أدخل اسمك الثلاثي هنا..." class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">الصف والشعبة:</label>
+                    <input type="text" id="student-class" required placeholder="مثال: أول ثانوي / 1" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-800">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition duration-200 text-base mt-2">
+                    ابدأ الاختبار الآن 🚀
+                </button>
+            </form>
+        </section>
+
+        <section id="view-quiz" class="hidden w-full glass-card text-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-200">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-200">
+                <div>
+                    <span id="question-progress" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">السؤال 1 من 10</span>
+                </div>
+                <div class="text-xs text-slate-500 font-semibold" id="student-info-display">الطالب: -</div>
+            </div>
+
+            <div id="question-card" class="mb-6">
+                <h3 id="question-title" class="text-lg font-bold text-slate-900 mb-4 leading-relaxed"></h3>
+                <div id="question-options" class="space-y-3"></div>
+            </div>
+
+            <!-- Instant feedback box -->
+            <div id="feedback-box" class="hidden p-4 rounded-xl mb-6 text-sm font-semibold"></div>
+
+            <div class="flex justify-between items-center pt-4 border-t border-slate-200">
+                <button id="btn-prev" onclick="prevQuestion()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm transition duration-150 disabled:opacity-40">السابق</button>
+                <button id="btn-next" onclick="nextQuestion()" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition duration-150">التالي</button>
+            </div>
+        </section>
+
+        <section id="view-result" class="hidden w-full glass-card text-slate-900 rounded-3xl p-8 shadow-2xl text-center border border-slate-200 max-w-lg">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-inner">🏆</div>
+            <h2 class="text-2xl font-black text-slate-900">تهانينا، لقد اتممت الاختبار!</h2>
+            <p class="text-sm text-slate-600 mt-1 mb-6">تم رصد وتصحيح إجاباتك بنجاح وفق معايير رياضيات 1-1.</p>
+            
+            <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl mb-6 space-y-3">
+                <div class="flex justify-between text-sm"><span class="text-slate-500">اسم الطالب:</span><span id="res-name" class="font-bold text-slate-800"></span></div>
+                <div class="flex justify-between text-sm"><span class="text-slate-500">الصف والشعبة:</span><span id="res-class" class="font-bold text-slate-800"></span></div>
+                <div class="flex justify-between text-sm border-t pt-3"><span class="text-slate-500">الدرجة النهائية:</span><span id="res-score" class="font-extrabold text-indigo-600 text-xl"></span></div>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="exportToExcel()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition duration-150 text-sm">
+                    📊 تصدير النتيجة إلى ملف Excel / Google Sheet
+                </button>
+                <button onclick="location.reload()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 rounded-xl transition duration-150 text-sm">
+                    إعادة الاختبار
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="w-full text-center py-3 text-xs text-slate-400 bg-slate-900/50">
+        منصة واجباتي التعليمية &copy; 1447 - رياضيات أول ثانوي مسارات
+    </footer>
+
+    <script>
+        const questions = [
+            {
+                title: "1. اكتب تخميناً يصف النمط الآتي: -2, 4, 10, 16, ...",
+                options: ["-10", "-6", "22", "24"],
+                answer: 2, // 22 (+6 each time)
+                explanation: "التخمين الصحيح: إضافة 6 في كل مرة (-2+6=4, 4+6=10, 10+6=16, 16+6=22)."
+            },
+            {
+                title: "2. ناتج جمع عددين فرديين هو دائماً:",
+                options: ["عدد فردي", "عدد أولي", "عدد زوجي", "عدد غير نسبي"],
+                answer: 2,
+                explanation: "البرهان: مجموع أي عددين فرديين (مثل 3 + 5 = 8) ينتج عنه دائماً عدد زوجي."
+            },
+            {
+                title: "3. حدد الفرض في العبارة الشرطية التالية: 'إذا كان الطقس ماطراً فسوف أستعمل المظلة'.",
+                options: ["سوف أستعمل المظلة", "الطقس ماطر", "الطقس غير ماطر", "لن أستعمل المظلة"],
+                answer: 1,
+                explanation: "الفرض هو الجملة التي تلي حرف الشرط (إذا)، وهي هنا 'الطقس ماطر'."
+            },
+            {
+                title: "4. التبرير الذي يستعمل الحقائق والقواعد والتعريفات وخصائص من أجل الوصول إلى نتائج منطقية هو:",
+                options: ["التبرير الاستقرائي", "التبرير الاستنتاجي", "التخمين الرياضي", "المثال المضاد"],
+                answer: 1,
+                explanation: "التبرير الاستنتاجي يعتمد على الحقائق والتعريفات والمسلمات والقوانين المنطقية."
+            },
+            {
+                title: "5. اذكر الخاصية التي تبرر العبارة: إذا كان a = b فإن a + c = b + c",
+                options: ["خاصية التماثل للمساواة", "خاصية الجمع للمساواة", "خاصية التعدي للمساواة", "خاصية الانعكاس للمساواة"],
+                answer: 1,
+                explanation: "خاصية الجمع للمساواة تنص على أنه إذا أضيف نفس العدد للطرفين تظل المساواة صحيحة."
+            },
+            {
+                title: "6. ما مدى صحة العبارة: 'تتقاطع ثلاثة مستقيمات في نقطتين'؟",
+                options: ["صحيحة دائماً", "صحيحة أحياناً", "غير صائبة أبداً", "لا يمكن التحديد"],
+                answer: 1,
+                explanation: "صحيحة أحياناً بحسب وضعية المستقيمات في المستوى (مثل التقاطع المثنى أو التوازي)."
+            },
+            {
+                title: "7. إذا كانت M نقطة منتصف القطعة المستقيمة XY، فإن العبارة الصحيحة هي:",
+                options: ["XY = MY", "XM ≅ MY", "XY ≅ XM", "XM ≅ XY"],
+                answer: 1,
+                explanation: "تعريف نقطة المنتصف يقتضي أن تقسم القطعة إلى قطعتين متطابقتين (XM ≅ MY)."
+            },
+            {
+                title: "8. المعاكس الإيجابي للعبارة الشرطية: 'إذا كانت الزاوية قائمة فإن قياسها 90°' هو:",
+                options: [
+                    "إذا كانت الزاوية ليست قائمة فإن قياسها ليس 90°",
+                    "إذا كان قياس الزاوية 90° فإنها زاوية قائمة",
+                    "إذا كان قياس الزاوية ليس 90° فإنها زاوية ليست قائمة",
+                    "إذا لم تكن الزاوية قائمة فإن قياسها 90°"
+                ],
+                answer: 2,
+                explanation: "المعاكس الإيجابي ينفي النتيجة وينفي الفرض ويعكسهما معاً."
+            },
+            {
+                title: "9. إذا تقاطع مستويان، فإن تقاطعهما يكون:",
+                options: ["نقطة واحدة", "مستقيمًا", "مستوى آخر", "مجموعة خالية"],
+                answer: 1,
+                explanation: "مسلمة تقاطع المستويات تنص على أن تقاطع مستويين مختلفين هو مستقيم."
+            },
+            {
+                title: "10. ما هو الحد التالي في المتتابعة المركبة: 1, 4, 2, 5, 3, 6, ... ؟",
+                options: ["3", "4", "5", "9"],
+                answer: 1, // 4 (نمط مركب: يزيد 3 ثم يقل 2: 1+3=4, 4-2=2, 2+3=5, 5-2=3, 3+3=6, 6-2=4)
+                explanation: "النمط مركب بزيادة 3 ثم طرح 2 بالتناوب، وبالتالي بعد 6 يقل بمقدار 2 لنحصل على 4."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let score = 0;
+        let studentData = { name: '', classRoom: '' };
+        let timerInterval;
+        let timeLeftSeconds = 90 * 60; // 90 minutes
+
+        const formRegister = document.getElementById('form-register');
+        const viewWelcome = document.getElementById('view-welcome');
+        const viewQuiz = document.getElementById('view-quiz');
+        const viewResult = document.getElementById('view-result');
+        const timerContainer = document.getElementById('timer-container');
+        const timeLeftEl = document.getElementById('time-left');
+
+        formRegister.addEventListener('submit', (e) => {
+            e.preventDefault();
+            studentData.name = document.getElementById('student-name').value.trim();
+            studentData.classRoom = document.getElementById('student-class').value.trim();
+            
+            if(!studentData.name || !studentData.classRoom) return;
+
+            document.getElementById('student-info-display').innerText = `الطالب: ${studentData.name} (${studentData.classRoom})`;
+            
+            viewWelcome.classList.add('hidden');
+            viewQuiz.classList.remove('hidden');
+            timerContainer.classList.remove('hidden');
+            timerContainer.classList.add('flex');
+
+            startTimer();
+            loadQuestion();
+        });
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if(timeLeftSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    finishQuiz();
+                    return;
+                }
+                timeLeftSeconds--;
+                let mins = Math.floor(timeLeftSeconds / 60);
+                let secs = timeLeftSeconds % 60;
+                timeLeftEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestionIndex];
+            document.getElementById('question-progress').innerText = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
+            document.getElementById('question-title').innerText = q.title;
+            
+            const optionsContainer = document.getElementById('question-options');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const isSelected = userAnswers[currentQuestionIndex] === idx;
+                const btn = document.createElement('button');
+                btn.className = `w-full text-right p-4 rounded-xl border transition duration-150 text-sm font-semibold flex items-center justify-between ${
+                    isSelected 
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-900 shadow-sm' 
+                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-800'
+                }`;
+                btn.innerHTML = `<span>${opt}</span> <span class="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-xs ${isSelected ? 'bg-indigo-600 text-white border-indigo-600' : ''}">${isSelected ? '✓' : ''}</span>`;
+                btn.onclick = () => selectOption(idx);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Feedback display if already answered
+            const feedbackBox = document.getElementById('feedback-box');
+            if(userAnswers[currentQuestionIndex] !== undefined) {
+                showFeedback(userAnswers[currentQuestionIndex]);
+            } else {
+                feedbackBox.classList.add('hidden');
+            }
+
+            document.getElementById('btn-prev').disabled = currentQuestionIndex === 0;
+            document.getElementById('btn-next.innerText') = currentQuestionIndex === questions.length - 1 ? 'إنهاء الاختبار' : 'التالي';
+        }
+
+        function selectOption(idx) {
+            userAnswers[currentQuestionIndex] = idx;
+            loadQuestion();
+            showFeedback(idx);
+        }
+
+        function showFeedback(selectedIdx) {
+            const q = questions[currentQuestionIndex];
+            const feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.classList.remove('hidden');
+
+            if(selectedIdx === q.answer) {
+                feedbackBox.className = "p-4 rounded-xl mb-6 text-sm font-semibold bg-emerald-50 border border-emerald-200 text-emerald-800";
+                feedbackBox.innerHTML = `✅ إجابة صحيحة!<br><span class="text-xs font-normal text-emerald-700 mt-1 block">التبرير: ${q.explanation}</span>`;
+            } else {
+                feedbackBox.className = "p-4 rounded-xl mb-6 text-sm font-semibold bg-rose-50 border border-rose-200 text-rose-800";
+                feedbackBox.innerHTML = `❌ إجابة خاطئة.<br><span class="text-xs font-normal text-rose-700 mt-1 block">التبرير الصحيح: ${q.explanation}</span>`;
+            }
+        }
+
+        function nextQuestion() {
+            if(currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevQuestion() {
+            if(currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            score = 0;
+            questions.forEach((q, idx) => {
+                if(userAnswers[idx] === q.answer) score += 3; // Total 30 marks
+            });
+
+            viewQuiz.classList.add('hidden');
+            timerContainer.classList.add('hidden');
+            viewResult.classList.remove('hidden');
+
+            document.getElementById('res-name').innerText = studentData.name;
+            document.getElementById('res-class').innerText = studentData.classRoom;
+            document.getElementById('res-score').innerText = `${score} / 30`;
+        }
+
+        function exportToExcel() {
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "اسم الطالب,الصف والشعبة,الدرجة,التاريخ والوقت\n";
+            csvContent += `"${studentData.name}","${studentData.classRoom}",${score}/30,"${new Date().toLocaleString('ar-SA')}"\n`;
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `نتيجة_اختبار_${studentData.name.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
